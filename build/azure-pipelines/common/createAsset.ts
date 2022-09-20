@@ -152,7 +152,14 @@ function getEnv(name: string): string {
 async function main(): Promise<void> {
 	const [, , product, os, arch, unprocessedType, fileName, filePath] = process.argv;
 	// getPlatform needs the unprocessedType
-	const platform = getPlatform(product, os, arch, unprocessedType);
+	let platform;
+	try {
+		platform = getPlatform(product, os, arch, unprocessedType);
+	} catch (e) {
+		console.warn(`Skipping artifact: ${e}`); // todo: remove after CLI types are added to releases
+		return;
+	}
+
 	const type = getRealType(unprocessedType);
 	const quality = getEnv('VSCODE_QUALITY');
 	const commit = process.env['VSCODE_DISTRO_COMMIT'] || getEnv('BUILD_SOURCEVERSION');
